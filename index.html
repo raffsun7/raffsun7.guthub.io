@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1 class="logo">Academic Hub</h1>
+        <nav>
+            <a href="#" class="active">Dashboard</a>
+            <a href="#">All Chapters</a>
+            <a href="#">Routines</a>
+        </nav>
+    </header>
+
+    <main>
+        <div id="dashboard-view">
+            <div class="dashboard-header">
+                <h2>Dashboard</h2>
+            </div>
+            <div id="new-dashboard-content">
+                <div class="dashboard-section">
+                    <h3>Upcoming Routines</h3>
+                    <div id="upcoming-routines-grid" class="dashboard-grid-condensed"><div class="loader"></div></div>
+                </div>
+                <div class="dashboard-section">
+                    <h3>Accuracy Check: Review Weak Chapters</h3>
+                    <div id="weak-chapters-box"><div class="loader"></div></div>
+                </div>
+                <div class="dashboard-section">
+                    <h3>Action Required: Missed Routines</h3>
+                    <div id="missed-routines-box"><div class="loader"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="chapters-view" class="hidden">
+            <div class="dashboard-header">
+                <h2>All Subjects & Chapters</h2>
+                <button id="open-chapters-modal-btn" class="primary-btn">+</button>
+            </div>
+            <div id="chapters-display-area" class="chapters-display-area"><div class="loader"></div></div>
+        </div>
+
+        <div id="routines-view" class="hidden">
+            <div class="dashboard-header">
+                <h2>All Routines</h2>
+                <button class="primary-btn">+ New Routine</button>
+            </div>
+            <div class="dashboard-grid"><div class="loader"></div></div>
+        </div>
+    </main>
+    
+    <div id="routine-modal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <h2 id="modal-title">Add New Routine</h2>
+            <form id="routine-form">
+                <div class="form-group">
+                    <label for="routine-date">Date</label>
+                    <input type="date" id="routine-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Class Topics (Select Chapters)</label>
+                    <div id="routine-chapters-checklist">
+                        </div>
+                </div>
+                <div class="form-group">
+                    <label for="exam-topics">Exam Topics (Manual Entry)</label>
+                    <textarea id="exam-topics" rows="3"></textarea>
+                </div>
+                <button type="submit" id="modal-submit-btn" class="primary-btn">Save</button>
+            </form>
+            <button id="close-routine-modal" class="close-modal-btn">&times;</button>
+        </div>
+    </div>
+    <div id="chapters-modal" class="modal-backdrop hidden">
+        <div class="modal-content"><h2 id="chapters-modal-title">Add Content</h2><div class="management-area"><div class="card"><h3>Add Subject</h3><form id="add-subject-form"><div class="form-group"><label for="subject-name">Subject Name</label><input type="text" id="subject-name" required></div><button type="submit" class="primary-btn">Add Subject</button></form></div><div class="card"><h3>Add Chapter</h3><form id="add-chapter-form"><div class="form-group"><label for="chapter-subject">Select Subject</label><select id="chapter-subject" required><option value="">-- Loading --</option></select></div><div class="form-group"><label for="chapter-name">Chapter Name</label><input type="text" id="chapter-name" required></div><button type="submit" class="primary-btn">Add Chapter</button></form></div></div><button id="close-chapters-modal-btn" class="close-modal-btn">&times;</button></div>
+    </div>
+    <div id="notes-modal" class="modal-backdrop hidden">
+        <div class="modal-content"><h2 id="notes-modal-title">Chapter Notes</h2><form id="notes-form"><div class="form-group"><textarea id="chapter-notes-textarea" rows="10"></textarea></div><button type="submit" id="save-note-btn" class="primary-btn">Save Note</button></form><button id="close-notes-modal-btn" class="close-modal-btn">&times;</button></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+
+    <script src="app.js"></script>
+    <script src="firestore.js"></script>
+</body>
+</html>
