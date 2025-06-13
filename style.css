@@ -191,7 +191,6 @@ nav a.active {
 .primary-btn {
   border: none;
   color: #fff;
-  background: var(--accent-cyan);
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
   font-family: var(--font-family);
@@ -216,7 +215,6 @@ nav a.active {
   gap: 1.5rem;
 }
 #upcoming-routines-grid .card {
-    width: 60vh;
 }
 button.notes-btn {
     color: white;

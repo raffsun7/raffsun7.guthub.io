@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     ${routines.map(r => `
                         <div style="display:flex;align-items:center;gap:8px;">
                             <input type="checkbox" class="missed-routine-checkbox" id="missed-${r.id}" data-id="${r.id}" ${r.isMissed ? 'checked' : ''}>
-                            <label for="missed-${r.id}">${r.class_topics || 'Routine'}</label>
+                            <label for="missed-${r.id}">Missed</label>
                         </div>
                     `).join('')}
                 </div>
