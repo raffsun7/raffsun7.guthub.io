@@ -191,6 +191,7 @@ nav a.active {
 .primary-btn {
   border: none;
   color: #fff;
+  background: var(--accent-cyan);
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
   font-family: var(--font-family);
