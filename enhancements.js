@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'previous-topic';
                     wrapper.innerHTML = `
-                        <h4>Previous Class Topic:</h4>
+                        <h4>Main Exam:</h4>
                         ${classTopicHTML}
                     `;
                     currentCard.insertBefore(wrapper, currentCard.querySelector('.missed-routine-tracker'));
