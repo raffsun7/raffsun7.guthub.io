@@ -85,16 +85,6 @@ document.addEventListener('DOMContentLoaded', function () {
         populateSubjectDropdowns();
         renderAllContent();
     });
-    function getPreviousRoutineChapters(dateString) {
-        const prevRoutines = allRoutines
-            .filter(r => r.date < dateString)
-            .sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        if (prevRoutines.length === 0) return [];
-
-        return prevRoutines[0].chapterNames || [];
-    }
-
 
 
     db.collection('chapters').orderBy('subjectId').orderBy('number', 'asc').onSnapshot(snapshot => {
@@ -261,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </div>
                 <h4>Class Topics:</h4>${chaptersHTML}
-                <h4>Exam:</h4>${examsHTML}
+                <h4>Exam Topics:</h4>${examsHTML}
                 <div class="missed-routine-tracker">
                     ${routines.map(r => `
                         <div style="display:flex;align-items:center;gap:8px;">
@@ -315,12 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 card.innerHTML = `
                     <h3>${dateLabel}</h3>
                     <h4>Class Topics:</h4>${classTopicsHTML}
-                    <h4>Exam:</h4><p>${
-                        routine.exam_topics && routine.exam_topics.trim()
-                            ? routine.exam_topics
-                            : getPreviousRoutineChapters(routine.date).join(', ') + ' <small style="color:var(--text-secondary);">(from previous class)</small>' || 'None'
-                    }</p>
-
+                    <h4>Exam Topics:</h4><p>${routine.exam_topics || 'None'}</p>
                 `;
 
                 upcomingRoutinesGrid.appendChild(card);
@@ -520,33 +505,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     newRoutineBtn.addEventListener('click', () => {
-        routineForm['routine-date'].addEventListener('change', () => {
-            const selectedDate = routineForm['routine-date'].value;
-            if (!selectedDate || currentEditId) return;
-
-            const previousTopics = getPreviousRoutineChapters(selectedDate);
-            if (previousTopics.length > 0) {
-                routineForm['exam-topics'].value = previousTopics.join('\n');
-            }
-        });
         currentEditId = null;
         routineForm.reset();
         modalTitle.textContent = "Add Routine";
         modalSubmitBtn.textContent = "Save";
         routineSubjectFilter.value = '';
-
-        const today = new Date().toISOString().split('T')[0];
-        const previousTopics = getPreviousRoutineChapters(today);
-
-        // Show previous chapters as default exam topic (editable)
-        if (previousTopics.length > 0) {
-            routineForm['exam-topics'].value = previousTopics.join('\n');
-        }
-
         populateChapterChecklist();
         routineModal.classList.remove('hidden');
     });
-
 
     routineSubjectFilter.addEventListener('change', () => {
         const checked = Array.from(routineChaptersChecklist.querySelectorAll('input:checked')).map(cb => cb.value);
