@@ -1,16 +1,16 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     const FIXED_SUBJECTS = [
-    { id: "phy1", name: "Physics 1st Paper" },
-    { id: "phy2", name: "Physics 2nd Paper" },
-    { id: "chem1", name: "Chemistry 1st Paper" },
-    { id: "chem2", name: "Chemistry 2nd Paper" },
-    { id: "math1", name: "Math 1st Paper" },
-    { id: "math2", name: "Math 2nd Paper" },
-    { id: "bio1", name: "Biology 1st Paper" },
-    { id: "bio2", name: "Biology 2nd Paper" },
-    { id: "gk", name: "General Knowledge" },
-    { id: "eng", name: "English" }
+        { id: "phy1", name: "Physics 1st Paper" },
+        { id: "phy2", name: "Physics 2nd Paper" },
+        { id: "chem1", name: "Chemistry 1st Paper" },
+        { id: "chem2", name: "Chemistry 2nd Paper" },
+        { id: "math1", name: "Math 1st Paper" },
+        { id: "math2", name: "Math 2nd Paper" },
+        { id: "bio1", name: "Biology 1st Paper" },
+        { id: "bio2", name: "Biology 2nd Paper" },
+        { id: "gk", name: "General Knowledge" },
+        { id: "eng", name: "English" }
     ];
 
     // 🔁 Add fixed subjects if Firestore has none yet
@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
-
 
     let currentEditId = null;
     let currentNotesChapterId = null;
@@ -46,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const weakChaptersBox = document.querySelector('#weak-chapters-box');
     const missedRoutinesBox = document.querySelector('#missed-routines-box');
     const newRoutineBtn = document.querySelector('#open-routine-modal-btn');
+
     document.querySelectorAll('.date-icon').forEach(icon => {
         icon.addEventListener('click', () => {
             const input = icon.parentElement.querySelector('input[type="date"]');
@@ -57,17 +57,19 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('#add-subject-form')?.closest('.card')?.remove();
 
     document.querySelectorAll('.close-modal-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        btn.closest('.modal-backdrop').classList.add('hidden');
+        btn.addEventListener('click', () => {
+            btn.closest('.modal-backdrop').classList.add('hidden');
         });
     });
 
     document.querySelector('#open-chapters-modal-btn').addEventListener('click', () => {
         document.querySelector('#chapters-modal').classList.remove('hidden');
     });
+
     document.querySelector('#close-chapters-modal-btn').addEventListener('click', () => {
         document.querySelector('#chapters-modal').classList.add('hidden');
     });
+
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
             document.querySelectorAll('.modal-backdrop').forEach(modal => {
@@ -76,16 +78,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-
-
-
     db.collection('subjects').onSnapshot(snapshot => {
         // Force use of FIXED_SUBJECTS only
         allSubjects = FIXED_SUBJECTS;
         populateSubjectDropdowns();
         renderAllContent();
     });
-
 
     db.collection('chapters').orderBy('name', 'asc').onSnapshot(snapshot => {
         allChapters = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -120,7 +118,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderChapterTables() {
-//        if (!chaptersDisplayArea.offsetParent) return;
         document.querySelector('#chapters-display-area .loader')?.remove();
 
         const chaptersBySubject = {};
@@ -145,16 +142,20 @@ document.addEventListener('DOMContentLoaded', function () {
                         <th class="col-proficiency">Proficiency</th>
                         <th class="col-exams">Exams</th>
                         <th class="col-notes">Notes</th>
+                        <th class="col-delete">Delete</th>
                     </tr>
                 </thead>
             `;
 
             const tbody = document.createElement('tbody');
-            subjectChapters.forEach(c => {
+            
+            // Sort chapters by their number before rendering
+            subjectChapters.sort((a, b) => (a.chapterNumber || 0) - (b.chapterNumber || 0)).forEach(c => {
                 const row = tbody.insertRow();
                 row.dataset.id = c.id;
+                // And update the row HTML:
                 row.innerHTML = `
-                    <td class="col-chapter">${c.name}</td>
+                    <td class="col-chapter">${c.chapterNumber ? c.chapterNumber + '. ' : ''}${c.name}</td>
                     <td class="col-status">
                         <select class="table-select status-select">
                             <option value="Not Started" ${c.status === 'Not Started' ? 'selected' : ''}>Not Started</option>
@@ -178,6 +179,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td class="col-notes">
                         <button class="notes-btn"><i class="fa-regular fa-note-sticky"></i></button>
                     </td>
+                    <td class="col-delete">
+                        <button class="delete-chapter-btn"><i class="fa-solid fa-xmark"></i></button>
+                    </td>
                 `;
             });
 
@@ -188,7 +192,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderRoutinesPage() {
-//        if (!routinesGrid.offsetParent) return;
         document.querySelector('#routines-view .loader')?.remove();
         routinesGrid.innerHTML = '';
 
@@ -244,14 +247,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `).join('')}
                 </div>
-
             `;
 
             routinesGrid.appendChild(card);
         });
     }
 
-        function renderDashboard() {
+    function renderDashboard() {
         if (!document.querySelector('#dashboard-view').offsetParent) return;
 
         const today = new Date();
@@ -370,14 +372,27 @@ document.addEventListener('DOMContentLoaded', function () {
         const name = addChapterForm['chapter-name'].value.trim();
         const subjectId = subjectSelectForNewChapter.value;
         if (!subjectId || !name) return alert("Please fill out both fields.");
-        db.collection('chapters').add({
-            name, subjectId,
-            status: 'Not Started',
-            proficiency: 'N/A',
-            examCount: 0,
-            notes: '',
-            completionDate: null
-        }).then(() => addChapterForm.reset()).catch(handleError);
+        
+        // Get all chapters for this subject to determine the next number
+        db.collection('chapters')
+            .where('subjectId', '==', subjectId)
+            .get()
+            .then(snapshot => {
+                const chapterNumber = snapshot.size + 1;
+                
+                return db.collection('chapters').add({
+                    name, 
+                    subjectId,
+                    chapterNumber,
+                    status: 'Not Started',
+                    proficiency: 'N/A',
+                    examCount: 0,
+                    notes: '',
+                    completionDate: null
+                });
+            })
+            .then(() => addChapterForm.reset())
+            .catch(handleError);
     });
 
     chaptersDisplayArea.addEventListener('change', e => {
@@ -427,6 +442,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
+
+        if (e.target.classList.contains('delete-chapter-btn') || 
+            e.target.closest('.delete-chapter-btn')) {
+            if (confirm("Are you sure you want to delete this chapter?")) {
+                db.collection('chapters').doc(id).delete().catch(handleError);
+            }
+        }
     });
 
     notesForm.addEventListener('submit', e => {
@@ -475,7 +497,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-
     routinesGrid.addEventListener('change', e => {
         if (e.target.classList.contains('missed-routine-checkbox')) {
             const id = e.target.dataset.id;
@@ -484,7 +505,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }).catch(handleError);
         }
     });
-
 
     newRoutineBtn.addEventListener('click', () => {
         currentEditId = null;
@@ -563,8 +583,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
         }
-
-
 
         promise.then(() => {
             routineModal.classList.add('hidden');
