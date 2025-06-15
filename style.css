@@ -193,6 +193,7 @@ nav a.active {
   color: #fff;
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
+  background: var(--accent-cyan);
   font-family: var(--font-family);
   font-weight: 500;
   cursor: pointer;
@@ -436,22 +437,22 @@ button.notes-btn:hover {
 }
 .subject-table th.col-chapter,
 .subject-table td.col-chapter {
-  width: 30%;
+  width: 35%;
 }
 
 .subject-table th.col-status,
 .subject-table td.col-status {
-  width: 15%;
+  width: 20%;
 }
 
 .subject-table th.col-proficiency,
 .subject-table td.col-proficiency {
-  width: 15%;
+  width: 20%;
 }
 
 .subject-table th.col-exams,
 .subject-table td.col-exams {
-  width: 75%;
+  width: 100%;
 }
 
 .subject-table th.col-notes,

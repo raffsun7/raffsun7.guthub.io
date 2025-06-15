@@ -87,26 +87,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    db.collection('chapters').orderBy('subjectId').orderBy('number', 'asc').onSnapshot(snapshot => {
+    db.collection('chapters').orderBy('name', 'asc').onSnapshot(snapshot => {
         allChapters = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        // Sort manually: first by subjectId, then by `number` if exists, else fallback to name
-        allChapters.sort((a, b) => {
-            if (a.subjectId !== b.subjectId) {
-                return a.subjectId.localeCompare(b.subjectId);
-            }
-
-            const aNum = typeof a.number === 'number' ? a.number : Infinity;
-            const bNum = typeof b.number === 'number' ? b.number : Infinity;
-
-            if (aNum !== bNum) return aNum - bNum;
-
-            return a.name.localeCompare(b.name);
-        });
-
         renderAllContent();
     });
-
 
     db.collection('routines').orderBy('date', 'asc').onSnapshot(snapshot => {
         allRoutines = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -381,22 +365,20 @@ document.addEventListener('DOMContentLoaded', function () {
         db.collection('subjects').add({ name }).then(() => addSubjectForm.reset()).catch(handleError);
     });
 
-    // 🔥 DISABLED because we use auto-numbered version in enhancements.js
-    // addChapterForm.addEventListener('submit', e => {
-    //     e.preventDefault();
-    //     const name = addChapterForm['chapter-name'].value.trim();
-    //     const subjectId = subjectSelectForNewChapter.value;
-    //     if (!subjectId || !name) return alert("Please fill out both fields.");
-    //     db.collection('chapters').add({
-    //         name, subjectId,
-    //         status: 'Not Started',
-    //         proficiency: 'N/A',
-    //         examCount: 0,
-    //         notes: '',
-    //         completionDate: null
-    //     }).then(() => addChapterForm.reset()).catch(handleError);
-    // });
-
+    addChapterForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const name = addChapterForm['chapter-name'].value.trim();
+        const subjectId = subjectSelectForNewChapter.value;
+        if (!subjectId || !name) return alert("Please fill out both fields.");
+        db.collection('chapters').add({
+            name, subjectId,
+            status: 'Not Started',
+            proficiency: 'N/A',
+            examCount: 0,
+            notes: '',
+            completionDate: null
+        }).then(() => addChapterForm.reset()).catch(handleError);
+    });
 
     chaptersDisplayArea.addEventListener('change', e => {
         if (!e.target.classList.contains('table-select')) return;
